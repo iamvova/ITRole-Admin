@@ -8,3 +8,9 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',monospace;
 }
+
+.active{
+  background-color: rgb(159, 162, 180, 0.08);
+  color: #fff;
+  border-left: 4px solid #DDE2FF;
+}
