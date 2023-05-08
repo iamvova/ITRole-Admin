@@ -87,18 +87,33 @@ const Form = styled.form`
 `
 const ConformBtn = styled.button`
   padding-left: 30px;
-    padding-right: 30px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background: #049f04;
-    color: #fff;
-    border: 0;
-    cursor: pointer;
-    margin-top: 50px;
+  padding-right: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: #049f04;
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+  margin-top: 15px;
 
-    &:hover{
-      opacity: 0.85;
-    }
+  &:hover{
+    opacity: 0.85;
+  }
+`
+const DeleteBtn = styled.button`
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: #b21111;
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+  margin-top: 50px;
+
+  &:hover{
+    opacity: 0.85;
+  }
 `
 const Close = styled.span`
   position: absolute;
@@ -107,7 +122,7 @@ const Close = styled.span`
   cursor: pointer;
   font-size: 24px;
 `
-const Members = ({role}) => {
+const Members = ({role, token}) => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [error, setError] = useState()
   const [data, setData] = useState()
@@ -119,37 +134,72 @@ const Members = ({role}) => {
 
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [currentElement, setCurrentElement] = useState([])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = JSON.parse(localStorage.getItem('access_token'))
-      const response = await fetch(role, {headers: {Authorization: `Bearer ${token}`}})
-      const responseData = await response.json()
-      setData(responseData)
-    }
-    
-    setTimeout(()=>{
-      fetchData()
-    }, 2000)
-  }, [role])
+  
+  useEffect(() => {setTimeout(()=>{setData(role)}, 1500)}, [role])
+  
+  if(token){
+    console.log(token)
+  }
 
 
-  const addNewUser = (event) => {  
-    const token = JSON.parse(localStorage.getItem('access_token'));
+  const addNewUser = (e) => {  
   
     const requestBody = {
       "name": name,
       "url_to_program": bachelorLink,
       "description": description,
       "video": videoLink
-    };
-  
-    if (Object.values(requestBody).some(value => value === undefined || value === '')) {
-      setError('Please fill in all fields');
     }
   
-    fetch(role, {
+    if (Object.values(requestBody).some(value => value === undefined || value === '')){
+      setError('Please fill in all fields')
+      console.log(error);
+    }
+  
+    fetch('http://127.0.0.1:8000/api/admin/role/', {
       method: 'POST',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    }).then(response => response.json())
+      .then(data => {setData(data)})
+      .catch(error => setError(error))
+
+    setShowAddModal(false)
+  }
+
+  const deleteRole = (id) => {
+    fetch(`http://127.0.0.1:8000/api/admin/role/${id}/`, {
+      method: 'DELETE',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {setData(data=>data)})
+    .catch(error => {setError(error)})
+    .finally(() => {setShowAddModal(false)})
+  }
+
+  const updateUser = (id) => {  
+  
+    const requestBody = {
+      "name": name,
+      "url_to_program": bachelorLink,
+      "description": description,
+      "video": videoLink
+    }
+  
+    if (Object.values(requestBody).some(value => value === undefined || value === '')){
+      setError('Please fill in all fields')
+      console.log(error);
+    }
+  
+    fetch('http://127.0.0.1:8000/api/admin/role/', {
+      method: 'PUT',
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -159,7 +209,7 @@ const Members = ({role}) => {
       .then(data => {setData(data=>data)})
       .catch(error => setError(error))
 
-      setShowAddModal(false)
+    setShowAddModal(false)
   }
 
 
@@ -214,7 +264,7 @@ const Members = ({role}) => {
             setShowUpdateModal(false)
             setCurrentElement([])}}>X</Close>
           {currentElement.map((i)=>(
-            <Form onSubmit={(e)=>addNewUser(e)} key={i.id}>
+            <Form onSubmit={(e)=>updateUser(e)} key={i.id}>
               <label htmlFor="name">Enter name</label>
               <input id='name' name='name' type="text" placeholder='Enter role' value={i.name} onChange={e => setName(e.target.value)} required/>
 
@@ -227,17 +277,21 @@ const Members = ({role}) => {
               <label htmlFor="videoLink">Enter video link</label>
               <input type="text" name="videoLink" id="videoLink" placeholder='Enter video link' value={i.video} onChange={e => setVideoLink(e.target.value)} required />
               {error ? error: <></>}
+              <DeleteBtn onClick={()=> {
+                deleteRole(i.id)
+                window.location.reload(true)
+                setCurrentElement([])
+                }} >Delete</DeleteBtn>
               <ConformBtn type='submit' onClick={()=> {
                 window.location.reload(true)
-                setCurrentElement([])}} >Confirm</ConformBtn>
+                setCurrentElement([])
+                
+                }} >Confirm</ConformBtn>
             </Form>
           ))}
 
         </Modal>
-      } 
-
-      
-    
+      }    
     </PosAbsolute>
   )
 }

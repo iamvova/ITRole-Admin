@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import QuestionList from '../components/QuestionList'
 import Loading from '../components/Loading'
 
 const Container = styled.div`
@@ -127,17 +126,7 @@ const Question = ({question}) => {
   const token = JSON.parse(localStorage.getItem('access_token'))
   
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(question, {headers: {Authorization: `Bearer ${token}`}})
-      const responseData = await response.json()
-      setData(responseData)
-    }
-    
-    setTimeout(()=>{fetchData()}, 1000)
-
-  }, [question, token])
-
+  useEffect(() => {setTimeout(()=>{setData(question)}, 1000)}, [question])
 
 
   const addNewQuestion = (event) => {

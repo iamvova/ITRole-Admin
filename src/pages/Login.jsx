@@ -89,7 +89,7 @@ const Login = () => {
     const [access, setAccess] = useState(false)
     const [error, setErorr] = useState()
 
-    const navigate = useNavigate();
+    const navigate = useNavigate()
     
 
     const handleSubmit = (event) => {
@@ -106,12 +106,14 @@ const Login = () => {
         .then(data => {
             setAccessToken(data.access)
             localStorage.setItem('access_token', JSON.stringify(data.access))  
+            console.log(accessToken)
             setAccess(true)          
         })
         .catch(error => setErorr(error))  
         if (access) {
             navigate('/dashboard', {state: {accessToken: accessToken}})
         }
+        
     }
 
     
@@ -121,7 +123,7 @@ const Login = () => {
         <LeftRegBar />
         <Container>
             <Title>Login</Title>
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={(event)=>handleSubmit(event)}>
                 <Label>Email</Label>
                 <Input type="text" placeholder="Username" value={username} onChange={(event) => setUsername(event.target.value)} required />
 

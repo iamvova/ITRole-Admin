@@ -11,31 +11,37 @@ const Container = styled.div`
 `
 
 const Dashboard = () => {
-  const [responseApi, setResponseApi] = useState(null)
+  const [role, setRole] = useState(null)
+  const [question, setQuestion] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const location = useLocation()
-  const accessToken = location.state ? location.state.accessToken : null
+  const token = location.state ? location.state.accessToken : null
 
-  
+
   useEffect(() => {
     const fetchData = async () => {
-      const token = JSON.parse(localStorage.getItem('access_token'))
-      const response = await fetch('http://127.0.0.1:8000/api/admin/', {headers: {Authorization: `Bearer ${token}`}})
+      const response = await fetch('http://127.0.0.1:8000/api/admin/role/', {headers: {Authorization: `Bearer ${token}`}})
       const responseData = await response.json()
-      setResponseApi(responseData)
+      setRole(responseData)
+    }
+    const fetchQuestion = async () => {
+      const response = await fetch('http://127.0.0.1:8000/api/admin/question/', {headers: {Authorization: `Bearer ${token}`}})
+      const responseData = await response.json()
+      setQuestion(responseData)
     }
     
     setTimeout(()=>{
       fetchData()  
+      fetchQuestion()
       setLoading(true)
     }, 2000)
-  }, [accessToken])
+  }, [token])
 
 
   return (
     <Container>
-      {loading ? <DashboardMenu responseApi={responseApi} />:<Loading />}
+      {loading ? <DashboardMenu role={role} question={question} />:<Loading />}
     </Container>
   )
 }
