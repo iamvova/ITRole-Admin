@@ -56,7 +56,7 @@ const DashboardMenu = ({role, question}) => {
             <Content>
                 <MenuList onClick={handleClick}>
                     <ListItem onClick={()=>setPage(<Overview />)} className="active"> <ImgIcon src={img.sideMenuLogo1} alt="icon" /> Stats</ListItem>
-                    <ListItem onClick={()=>setPage(<Question question={question}  />)}> <ImgIcon src={img.sideMenuLogo2} alt="icon" /> Questions</ListItem>
+                    <ListItem onClick={()=>setPage(<Question question={question} roleData={role}  />)}> <ImgIcon src={img.sideMenuLogo2} alt="icon" /> Questions</ListItem>
                     <ListItem onClick={()=>setPage(<Members role={role} />)}> <ImgIcon src={img.sideMenuLogo4} alt="icon" /> Roles</ListItem>
                     <ListItem onClick={()=>setPage(<Overview />)}> <ImgIcon src={img.sideMenuLogo3} alt="icon" /> Results</ListItem>
                     <ListItem onClick={()=>setPage(<Settings />)}> <ImgIcon src={img.sideMenuLogo5} alt="icon" /> Settings</ListItem>

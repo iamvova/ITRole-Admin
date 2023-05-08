@@ -278,7 +278,7 @@ const Members = ({role}) => {
 
                 setTimeout(()=>{
                   window.location.reload(true)  
-                }, 1000)
+                }, 1500)
                 setCurrentElement([])
 
                 }} >Delete</DeleteBtn>

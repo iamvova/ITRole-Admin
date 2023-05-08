@@ -124,7 +124,7 @@ const ListItem = styled.li`
   }
 `
 
-const Question = ({question}) => {
+const Question = ({question, roleData}) => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [data, setData] = useState()
 
@@ -153,7 +153,6 @@ const Question = ({question}) => {
       "point": parseInt(point),
       "role": role
     }
-    console.log(requestBody)
     if (Object.values(requestBody).some(value => value === undefined || value === '')) {setError('Please fill in all fields')}
   
     fetch('http://127.0.0.1:8000/api/admin/question/', {
@@ -184,11 +183,9 @@ const Question = ({question}) => {
         'Content-Type': 'application/json'
       }
     }).then(res =>res.json())
-    .then(data=>console.log(data))
     .catch(error => setError(error))
     .finally(() => setShowAddModal(false))
   }
-
 
 
   return (
@@ -226,10 +223,7 @@ const Question = ({question}) => {
 
             <label htmlFor="role"></label>
             <select name="role" id="role" value={role} onChange={e => setRole(e.target.value)}>
-              <option value="Дизайнер">Дизайнер</option>
-              <option value="Розробник">Розробник</option>
-              <option value="Менеджер">Менеджер</option>
-              <option value="Тестувальник">Тестувальник</option>
+              {roleData.map((i)=>(<option key={i.id} value={i.name}>{i.name}</option>))}
             </select>
             {error ? error: <></>}
 
@@ -260,19 +254,15 @@ const Question = ({question}) => {
 
               <label htmlFor="role"></label>
               <select name="role" id="role" value={i.role} onChange={e => setRole(e.target.value)}>
-                <option value="Дизайнер">Дизайнер</option>
-                <option value="Розробник">Розробник</option>
-                <option value="Менеджер">Менеджер</option>
-                <option value="Тестувальник">Тестувальник</option>
+                {roleData.map((i)=>(<option value={i.name}>{i.name}</option>))}
               </select>
               {error ? error: <></>}
+
               <DeleteBtn onClick={()=> {
                 deleteQuestion(i.id)
-                setTimeout(()=>{
-                  window.location.reload(true)
-                }, 1000)
-                setCurrentElement([])
-                }} >Delete</DeleteBtn>
+                setTimeout(()=>{window.location.reload(true)}, 1500)
+                setCurrentElement([])}} >Delete</DeleteBtn>
+
               <ConformBtn type='submit' onClick={()=> {
                 window.location.reload(true)
                 setCurrentElement([])}}>Confirm</ConformBtn>
