@@ -180,32 +180,24 @@ const Members = ({role}) => {
     .finally(() => setShowAddModal(false))
   }
 
-  const updateUser = (id) => {  
-  
-    const requestBody = {
-      "name": name,
-      "url_to_program": bachelorLink,
-      "description": description,
-      "video": videoLink
-    }
-  
-    if (Object.values(requestBody).some(value => value === undefined || value === '')){
-      setError('Please fill in all fields')
-      console.log(error);
-    }
-  
-    fetch('http://127.0.0.1:8000/api/admin/role/', {
+  const updateRole = (id) => {  
+    fetch(`http://127.0.0.1:8000/api/admin/role/${id}/`, {
       method: 'PUT',
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        "name": name,
+        "url_to_program": bachelorLink,
+        "description": description,
+        "video": videoLink
+      })
     }).then(response => response.json())
-      .then(data => {setData(data=>data)})
+      .then(data => {console.log(data)})
       .catch(error => setError(error))
 
-    setShowAddModal(false)
+      setShowAddModal(false)
   }
 
 
@@ -221,14 +213,23 @@ const Members = ({role}) => {
                   key={i.id} 
                   onClick={()=>{
                     setCurrentElement((prev) => [...prev, i])
+                    setName(i.name)
+                    setBachelorLink(i.url_to_program)
+                    setDescription(i.description)
+                    setVideoLink(i.video)
                     setShowUpdateModal(true)
-                    
                   }} 
                   >{i.name}</ListItem>
               )) : <Loading />}
 
             </ListQuestions>
-            <AddNewQuestionBtn onClick={()=>setShowAddModal(true)}>Add Role</AddNewQuestionBtn>
+            <AddNewQuestionBtn onClick={()=>{
+              setShowAddModal(true)
+              setName('')
+              setBachelorLink('')
+              setDescription('')
+              setVideoLink('')
+            }}>Add Role</AddNewQuestionBtn>
           </Content>
       </Container>
     
@@ -260,30 +261,29 @@ const Members = ({role}) => {
             setShowUpdateModal(false)
             setCurrentElement([])}}>X</Close>
           {currentElement.map((i)=>(
-            <Form onSubmit={(e)=>updateUser(e)} key={i.id}>
+            <Form key={i.id}>
               <label htmlFor="name">Enter name</label>
-              <input id='name' name='name' type="text" placeholder='Enter role' value={i.name} onChange={e => setName(e.target.value)} required/>
+              <input id='name' name='name' type="text" placeholder='Enter role' value={name} onChange={e => setName(e.target.value)} required/>
 
               <label htmlFor="bachelorLink">Enter URL to bachelor program: </label>
-              <input id='bachelorLink' name='bachelorLink' type="text" placeholder='Enter URL to bachelor program' value={i.url_to_program} onChange={e => setBachelorLink(e.target.value)} required/>
+              <input id='bachelorLink' name='bachelorLink' type="text" placeholder='Enter URL to bachelor program' value={bachelorLink} onChange={e => setBachelorLink(e.target.value)} required/>
 
               <label htmlFor="description">Enter description</label>
-              <input id='description' name='description' type="text" placeholder='Enter description' value={i.description} onChange={e => setDescription(e.target.value)} required/>
+              <input id='description' name='description' type="text" placeholder='Enter description' value={description} onChange={e => setDescription(e.target.value)} required/>
 
               <label htmlFor="videoLink">Enter video link</label>
-              <input type="text" name="videoLink" id="videoLink" placeholder='Enter video link' value={i.video} onChange={e => setVideoLink(e.target.value)} required />
+              <input type="text" name="videoLink" id="videoLink" placeholder='Enter video link' value={videoLink} onChange={e => setVideoLink(e.target.value)} required />
               {error ? error: <></>}
               <DeleteBtn onClick={()=> {
                 deleteRole(i.id)
 
-                setTimeout(()=>{
-                  window.location.reload(true)  
-                }, 1500)
+                setTimeout(()=>{window.location.reload(true)}, 1500)
                 setCurrentElement([])
 
                 }} >Delete</DeleteBtn>
               <ConformBtn type='submit' onClick={()=> {
-                window.location.reload(true)
+                updateRole(i.id)
+                setTimeout(()=>{window.location.reload(true)}, 1500)
                 setCurrentElement([])
                 
                 }} >Confirm</ConformBtn>
