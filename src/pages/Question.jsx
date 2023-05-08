@@ -186,7 +186,27 @@ const Question = ({question, roleData}) => {
     .catch(error => setError(error))
     .finally(() => setShowAddModal(false))
   }
+  
+  const updateQuestion = (id) => {  
+    fetch(`http://127.0.0.1:8000/api/admin/question/${id}/`, {
+      method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "question": name,
+        "positive_choice": positiveAnswer,
+        "negative_choice": negativeAnswer,
+        "point": parseInt(point),
+        "role": role
+      })
+    }).then(response => response.json())
+      .then(data => {console.log(data)})
+      .catch(error => setError(error))
 
+      setShowAddModal(false)
+  }
 
   return (
     <PosAbsolute>
@@ -197,7 +217,13 @@ const Question = ({question, roleData}) => {
                 {data ? data.map((i) => (
                     <ListItem key={i.id} onClick={()=>{
                       setCurrentElement((prev) => [...prev, i])
+                      setName(i.question)
+                      setNegativeAnswer(i.negative_choice)
+                      setPositiveAnswer(i.positive_choice)
+                      setPoint(i.point)
+                      setRole(i.role)
                       setShowUpdateModal(true)
+                      
                     }}>{i.question}</ListItem>
                 )): <Loading />}
               </ListQuestions>
@@ -238,33 +264,34 @@ const Question = ({question, roleData}) => {
             setShowUpdateModal(false) 
             setCurrentElement([])}}>X</Close>
           {currentElement.map((i)=>(
-            <Form onSubmit={(e)=>addNewQuestion(e)} key={i.id}>
-              {console.log(i.id)}
+            <Form key={i.id}>
+              
               <label htmlFor="question">Enter question</label>
-              <input id='question' name='question' type="text" placeholder='Enter question' value={i.question} onChange={e => setName(e.target.value)} />
+              <input id='question' name='question' type="text" placeholder='Enter question' value={name} onChange={e => setName(e.target.value)} />
 
               <label htmlFor="answer1">Enter positive answer</label>
-              <input id='answer1' name='answer1' type="text" placeholder='Enter answer 3' value={i.positive_choice} onChange={e => setPositiveAnswer(e.target.value)} />
+              <input id='answer1' name='answer1' type="text" placeholder='Enter answer 3' value={positiveAnswer} onChange={e => setPositiveAnswer(e.target.value)} />
 
               <label htmlFor="answer2">Enter negative answer</label>
-              <input id='answer2' name='answer2' type="text" placeholder='Enter answer 2' value={i.negative_choice} onChange={e => setNegativeAnswer(e.target.value)} />
+              <input id='answer2' name='answer2' type="text" placeholder='Enter answer 2' value={negativeAnswer} onChange={e => setNegativeAnswer(e.target.value)} />
 
               <label htmlFor="point">Point</label>
-              <input type="number" name="point" id="point" value={i.point} onChange={e => setPoint(e.target.value)} />
+              <input type="number" name="point" id="point" value={point} onChange={e => setPoint(e.target.value)} />
 
               <label htmlFor="role"></label>
-              <select name="role" id="role" value={i.role} onChange={e => setRole(e.target.value)}>
-                {roleData.map((i)=>(<option value={i.name}>{i.name}</option>))}
+              <select name="role" id="role" value={role} onChange={e => setRole(e.target.value)}>
+                {roleData.map((i)=>(<option key={i.id} value={role}>{i.name}</option>))}
               </select>
               {error ? error: <></>}
 
               <DeleteBtn onClick={()=> {
                 deleteQuestion(i.id)
                 setTimeout(()=>{window.location.reload(true)}, 1500)
-                setCurrentElement([])}} >Delete</DeleteBtn>
+                setCurrentElement([])}}>Delete</DeleteBtn>
 
               <ConformBtn type='submit' onClick={()=> {
-                window.location.reload(true)
+                updateQuestion(i.id)
+                setTimeout(()=>{window.location.reload(true)}, 1500)
                 setCurrentElement([])}}>Confirm</ConformBtn>
             </Form>
           ))}
