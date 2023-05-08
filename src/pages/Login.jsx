@@ -102,21 +102,21 @@ const Login = () => {
             password: password
           })
         })
-        .then(response => response.json())
+        .then(response => response.ok ? response.json() : setPassword(''))
         .then(data => {
             setAccessToken(data.access)
             localStorage.setItem('access_token', JSON.stringify(data.access))  
             console.log(accessToken)
             setAccess(true)          
         })
-        .catch(error => setErorr(error))  
+        .catch(setPassword(''))  
         if (access) {
             navigate('/dashboard', {state: {accessToken: accessToken}})
         }
         
     }
 
-    
+    if(error) console.log(error);
     
   return (
     <Wrapper>
@@ -129,7 +129,7 @@ const Login = () => {
 
                 <Label>Password</Label>
                 <Input type="text" placeholder="Password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-                {error && <div>{error}</div>}
+                {error ? <>{error}</>:<></>}
                 <Button type="submit">Login</Button>
                 <Subtext>Forgot password  <A href='!#'> Sign up <AiOutlineArrowRight /></A></Subtext>
             </Form>

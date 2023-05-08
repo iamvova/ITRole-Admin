@@ -64,7 +64,6 @@ const Modal = styled.div`
   margin-left: 30px;
   margin-right: 30px;
 `
-
 const Form = styled.form`
   width: 500px;
   margin: 0 auto;
@@ -122,7 +121,7 @@ const Close = styled.span`
   cursor: pointer;
   font-size: 24px;
 `
-const Members = ({role, token}) => {
+const Members = ({role}) => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [error, setError] = useState()
   const [data, setData] = useState()
@@ -137,10 +136,7 @@ const Members = ({role, token}) => {
   
   useEffect(() => {setTimeout(()=>{setData(role)}, 1500)}, [role])
   
-  if(token){
-    console.log(token)
-  }
-
+  const token = JSON.parse(localStorage.getItem('access_token'))
 
   const addNewUser = (e) => {  
   
@@ -153,7 +149,7 @@ const Members = ({role, token}) => {
   
     if (Object.values(requestBody).some(value => value === undefined || value === '')){
       setError('Please fill in all fields')
-      console.log(error);
+      console.log(error)
     }
   
     fetch('http://127.0.0.1:8000/api/admin/role/', {
@@ -164,24 +160,24 @@ const Members = ({role, token}) => {
       },
       body: JSON.stringify(requestBody)
     }).then(response => response.json())
-      .then(data => {setData(data)})
+      .then(data => setData(data))
       .catch(error => setError(error))
 
     setShowAddModal(false)
   }
 
   const deleteRole = (id) => {
+    console.log(token);
     fetch(`http://127.0.0.1:8000/api/admin/role/${id}/`, {
       method: 'DELETE',
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
-    })
-    .then(response => response.json())
-    .then(data => {setData(data=>data)})
-    .catch(error => {setError(error)})
-    .finally(() => {setShowAddModal(false)})
+    }).then(res =>res.json())
+    .then(data=>setData(data))
+    .catch(error => setError(error))
+    .finally(() => setShowAddModal(false))
   }
 
   const updateUser = (id) => {  
@@ -279,8 +275,12 @@ const Members = ({role, token}) => {
               {error ? error: <></>}
               <DeleteBtn onClick={()=> {
                 deleteRole(i.id)
-                window.location.reload(true)
+
+                setTimeout(()=>{
+                  window.location.reload(true)  
+                }, 1000)
                 setCurrentElement([])
+
                 }} >Delete</DeleteBtn>
               <ConformBtn type='submit' onClick={()=> {
                 window.location.reload(true)

@@ -84,11 +84,26 @@ const ConformBtn = styled.button`
     color: #fff;
     border: 0;
     cursor: pointer;
-    margin-top: 50px;
+    margin-top: 10px;
 
     &:hover{
       opacity: 0.85;
     }
+`
+const DeleteBtn = styled.button`
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: #b21111;
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+  margin-top: 50px;
+
+  &:hover{
+    opacity: 0.85;
+  }
 `
 const Close = styled.span`
   position: absolute;
@@ -119,7 +134,7 @@ const Question = ({question}) => {
   const [positiveAnswer, setPositiveAnswer] = useState()
   const [negativeAnswer, setNegativeAnswer] = useState()
   const [point, setPoint] = useState()
-  const [role, setRole] = useState()
+  const [role, setRole] = useState("Дизайнер")
   const [currentElement, setCurrentElement] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   
@@ -130,29 +145,48 @@ const Question = ({question}) => {
 
 
   const addNewQuestion = (event) => {
-    event.preventDefault();
+    event.preventDefault()
     const requestBody = {
       "question": name,
       "positive_choice": positiveAnswer,
       "negative_choice": negativeAnswer,
       "point": parseInt(point),
       "role": role
-    };
-  
+    }
+    console.log(requestBody)
     if (Object.values(requestBody).some(value => value === undefined || value === '')) {setError('Please fill in all fields')}
   
-    fetch(question, {
+    fetch('http://127.0.0.1:8000/api/admin/question/', {
       method: 'POST',
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        "question": name,
+        "positive_choice": positiveAnswer,
+        "negative_choice": negativeAnswer,
+        "point": parseInt(point),
+        "role": role
+      })
     }).then(response => response.json())
-      .then(data => {setData(data=>data)})
+      .then(data => {setData(data)})
       .catch(error => setError(error))
 
       setShowAddModal(false)
+  }
+
+  const deleteQuestion = (id)=>{
+    fetch(`http://127.0.0.1:8000/api/admin/question/${id}/`, {
+      method: 'DELETE',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then(res =>res.json())
+    .then(data=>console.log(data))
+    .catch(error => setError(error))
+    .finally(() => setShowAddModal(false))
   }
 
 
@@ -210,7 +244,8 @@ const Question = ({question}) => {
             setShowUpdateModal(false) 
             setCurrentElement([])}}>X</Close>
           {currentElement.map((i)=>(
-            <Form onSubmit={(e)=>addNewQuestion(e)}>
+            <Form onSubmit={(e)=>addNewQuestion(e)} key={i.id}>
+              {console.log(i.id)}
               <label htmlFor="question">Enter question</label>
               <input id='question' name='question' type="text" placeholder='Enter question' value={i.question} onChange={e => setName(e.target.value)} />
 
@@ -231,7 +266,13 @@ const Question = ({question}) => {
                 <option value="Тестувальник">Тестувальник</option>
               </select>
               {error ? error: <></>}
-
+              <DeleteBtn onClick={()=> {
+                deleteQuestion(i.id)
+                setTimeout(()=>{
+                  window.location.reload(true)
+                }, 1000)
+                setCurrentElement([])
+                }} >Delete</DeleteBtn>
               <ConformBtn type='submit' onClick={()=> {
                 window.location.reload(true)
                 setCurrentElement([])}}>Confirm</ConformBtn>

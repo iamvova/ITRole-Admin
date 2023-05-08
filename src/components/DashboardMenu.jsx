@@ -39,7 +39,7 @@ const ImgIcon = styled.img`
 `
 
 
-const DashboardMenu = ({role, question, token}) => {
+const DashboardMenu = ({role, question}) => {
 
     const [page, setPage] = useState()
 
@@ -47,7 +47,6 @@ const DashboardMenu = ({role, question, token}) => {
         e.target.parentElement.childNodes.forEach(item => item.classList.remove('active'))
         e.target.classList.add('active')
     }
-    if(token) console.log(token)
 
 
   return (
@@ -57,8 +56,8 @@ const DashboardMenu = ({role, question, token}) => {
             <Content>
                 <MenuList onClick={handleClick}>
                     <ListItem onClick={()=>setPage(<Overview />)} className="active"> <ImgIcon src={img.sideMenuLogo1} alt="icon" /> Stats</ListItem>
-                    <ListItem onClick={()=>setPage(<Question token={token} question={question}  />)}> <ImgIcon src={img.sideMenuLogo2} alt="icon" /> Questions</ListItem>
-                    <ListItem onClick={()=>setPage(<Members token={token} role={role} />)}> <ImgIcon src={img.sideMenuLogo4} alt="icon" /> Roles</ListItem>
+                    <ListItem onClick={()=>setPage(<Question question={question}  />)}> <ImgIcon src={img.sideMenuLogo2} alt="icon" /> Questions</ListItem>
+                    <ListItem onClick={()=>setPage(<Members role={role} />)}> <ImgIcon src={img.sideMenuLogo4} alt="icon" /> Roles</ListItem>
                     <ListItem onClick={()=>setPage(<Overview />)}> <ImgIcon src={img.sideMenuLogo3} alt="icon" /> Results</ListItem>
                     <ListItem onClick={()=>setPage(<Settings />)}> <ImgIcon src={img.sideMenuLogo5} alt="icon" /> Settings</ListItem>
                 </MenuList>
